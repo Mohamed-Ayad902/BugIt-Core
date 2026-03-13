@@ -11,6 +11,21 @@ android {
         }
     }
 
+    packaging {
+        resources {
+            // These files are metadata for standard Java environments
+            // android uses D8/R8 to compile classes into DEX files,
+            // so these INDEX and DEPENDENCY files are redundant and cause merge conflicts
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/DEPENDENCIES"
+
+            // exclude redundant license files to keep the apk size smaller
+            // and avoid potential merge conflicts between different Google libraries
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.bugitcore"
         minSdk = 24
@@ -40,6 +55,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-contracts"))
+    implementation(project(":core"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

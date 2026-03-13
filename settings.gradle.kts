@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "BugItCore"
 include(":app")
- 
+include(":core-contracts")
+include(":core")
