@@ -1,5 +1,20 @@
 plugins {
     alias(libs.plugins.android.library)
+    id("maven-publish")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            groupId = "com.bugit.sdk"
+            artifactId = "contracts"
+            version = "1.0.0"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
 }
 
 android {
@@ -9,7 +24,11 @@ android {
             minorApiLevel = 1
         }
     }
-
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
     defaultConfig {
         minSdk = 24
 

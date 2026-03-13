@@ -2,8 +2,18 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    id("maven-publish")
 }
-
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            groupId = "com.bugit.sdk"
+            artifactId = "core"
+            version = "1.0.0"
+            afterEvaluate { from(components["release"]) }
+        }
+    }
+}
 android {
     namespace = "com.example.core"
     compileSdk {
@@ -11,7 +21,11 @@ android {
             minorApiLevel = 1
         }
     }
-
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
     defaultConfig {
         minSdk = 24
 
