@@ -79,12 +79,13 @@ internal class RetrofitNetworkProvider(private val apiService: ApiService) : INe
             files = multipartFiles
         )
 
+        val responseBodyString = response.body()?.string()
+
         return@executeSafe when {
-            responseWrappedModel == Nothing::class.java || response.code() == 204 || response.body()?.string().isNullOrBlank() -> Unit as ResponseBody
-            response.isSuccessful -> response.body()?.string()?.getModelFromJSON(responseWrappedModel)
-                ?: throw IOException("Empty response body")
+            responseWrappedModel == Nothing::class.java || response.code() == 204 || responseBodyString.isNullOrBlank() -> Unit as ResponseBody
+            response.isSuccessful -> responseBodyString.getModelFromJSON(responseWrappedModel)
+                ?: throw IOException("Failed to parse JSON into model")
             else -> {
-                // Manually map the error response here instead of throwing HttpException
                 val rawErrorBody = try { response.errorBody()?.string() } catch (_: Exception) { null }
                 throw NetworkResponseException(
                     statusCode = response.code(),

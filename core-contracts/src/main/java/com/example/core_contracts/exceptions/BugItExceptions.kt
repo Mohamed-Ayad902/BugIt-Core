@@ -12,6 +12,9 @@ sealed class BugItExceptions(
             message?.let { append(", message: $message") }
         }.toString())
 
+    class LocalIOOperation(message: String? = null, cause: Throwable? = null) :
+        BugItExceptions(message, cause)
+
     /** serialization or deserialization errors */
     class SerializationException(message: String?, cause: Throwable? = null) :
         BugItExceptions(message, cause)

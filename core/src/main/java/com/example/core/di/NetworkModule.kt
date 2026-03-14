@@ -40,6 +40,22 @@ internal object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideAuthInterceptor(): Interceptor {
+        return Interceptor { chain ->
+            val original = chain.request()
+            val originalHttpUrl = original.url
+
+            val url = originalHttpUrl.newBuilder()
+                .addQueryParameter("key", BuildConfig.IMGBB_API_KEY)
+                .build()
+
+            val requestBuilder = original.newBuilder().url(url)
+            chain.proceed(requestBuilder.build())
+        }
+    }
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
         authInterceptor: Interceptor
@@ -57,7 +73,7 @@ internal object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.imgbb.com/1/")
+            .baseUrl(BuildConfig.IMGBB_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

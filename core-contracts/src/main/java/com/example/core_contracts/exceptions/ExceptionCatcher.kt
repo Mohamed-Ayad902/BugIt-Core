@@ -1,6 +1,8 @@
 package com.example.core_contracts.exceptions
 
+import com.example.core_contracts.extensions.loge
 import kotlinx.coroutines.CancellationException
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -8,12 +10,15 @@ import java.net.SocketTimeoutException
 internal object ExceptionCatcher {
     fun map(throwable: Throwable): BugItExceptions {
         if (throwable is CancellationException) throw throwable
+        throwable.loge("ExceptionCatcher")
 
         return when (throwable) {
             is NetworkResponseException -> mapNetworkResponse(throwable)
 
             is SocketTimeoutException -> BugItExceptions.Network.Connection(throwable.message ?: "Connection timed out", throwable)
-            is ConnectException, is IOException -> BugItExceptions.Network.Connection(throwable.message ?: "Network error", throwable)
+            is ConnectException -> BugItExceptions.Network.Connection(throwable.message ?: "Network error", throwable)
+            is FileNotFoundException -> BugItExceptions.LocalIOOperation(throwable.message ?: "File not found", throwable)
+            is IOException -> BugItExceptions.LocalIOOperation(throwable.message ?: "IO Operation failed", throwable)
             is IllegalStateException -> BugItExceptions.ValidationException(Any::class, throwable.message)
             is BugItExceptions -> throwable
 

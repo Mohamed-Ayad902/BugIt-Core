@@ -18,8 +18,8 @@ interface INetworkProvider {
     suspend fun <ResponseBody, RequestBody> postWithImagesFile(
         responseWrappedModel: Type,
         pathUrl: String,
-        headers: Map<String, Any>?,
-        queryParams: Map<String, Any>?,
+        headers: Map<String, Any>? = null,
+        queryParams: Map<String, Any>? = null,
         requestBody: RequestBody?,
         files: HashMap<String, File>
     ): ResponseBody
