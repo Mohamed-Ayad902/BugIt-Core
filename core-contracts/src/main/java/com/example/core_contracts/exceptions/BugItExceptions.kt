@@ -38,7 +38,7 @@ sealed class BugItExceptions(
         BugItExceptions(message, cause)
 }
 
-internal class NetworkResponseException(
+class NetworkResponseException(
     val statusCode: Int,
     val body: String? = null,
     message: String? = null,

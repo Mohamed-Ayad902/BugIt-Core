@@ -40,11 +40,34 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "IMGBB_BASE_URL", "\"https://api.imgbb.com/1/\"")
+        }
+        debug {
+            isMinifyEnabled = false
+            buildConfigField("String", "IMGBB_BASE_URL", "\"https://api.imgbb.com/1/\"")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        buildConfig = true
+    }
+    packaging {
+        resources {
+            // Google SDKs bring a lot of redundant Java metadata
+            // we must strip it out so the Android packager doesn't crash
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/DEPENDENCIES"
+            excludes += "/META-INF/DEPENDENCIES.txt"
+            excludes += "/META-INF/LICENSE"
+            excludes += "/META-INF/LICENSE.txt"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/NOTICE.txt"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/INDEX.LIST"
+        }
     }
 }
 
