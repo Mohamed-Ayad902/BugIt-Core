@@ -1,14 +1,17 @@
 package com.example.core.di
 
+import android.content.Context
 import com.example.core.BuildConfig
 import com.example.core.data_source.remote.ApiService
 import com.example.core.data_source.remote.RetrofitNetworkProvider
+import com.example.core.utils.NativeKeys
 import com.example.core_contracts.data_source.remote.INetworkProvider
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -40,13 +43,13 @@ internal object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(): Interceptor {
+    fun provideAuthInterceptor(@ApplicationContext context: Context): Interceptor {
         return Interceptor { chain ->
             val original = chain.request()
             val originalHttpUrl = original.url
 
             val url = originalHttpUrl.newBuilder()
-                .addQueryParameter("key", BuildConfig.IMGBB_API_KEY)
+                .addQueryParameter("key", NativeKeys.getImgBBApiKey(context))
                 .build()
 
             val requestBuilder = original.newBuilder().url(url)

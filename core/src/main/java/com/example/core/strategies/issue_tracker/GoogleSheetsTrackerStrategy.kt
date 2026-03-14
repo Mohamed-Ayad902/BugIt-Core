@@ -1,7 +1,7 @@
 package com.example.core.strategies.issue_tracker
 
+import com.example.core.feature.bug_reporting.domain.model.Bug
 import com.example.core.feature.bug_reporting.domain.model.BugReportRequest
-import com.example.core_contracts.extensions.logw
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.model.AddSheetRequest
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest
@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 /**
  * Implementation of [IIssueTrackerStrategy] that logs bug reports into Google Sheets.
@@ -30,14 +31,18 @@ internal class GoogleSheetsTrackerStrategy(
      * Appends a bug report as a new row in the spreadsheet.
      * Maps [request] fields and the [uploadedImageUrl] into a flat row structure.
      */
-    override suspend fun saveIssue(request: BugReportRequest, uploadedImageUrl: String) {
-        "Saving bug report to Google Sheets... $request -- $uploadedImageUrl".logw("GoogleSheetsTrackerStrategy")
-        withContext(Dispatchers.IO) {
+    override suspend fun saveIssue(request: BugReportRequest, uploadedImageUrl: String): Bug {
+        return withContext(Dispatchers.IO) {
             val tabName = getCurrentDateTabName()
 
             ensureTabExists(tabName)
 
+            val generatedId = UUID.randomUUID().toString()
+            val fullTimestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+
             val rowValues: List<Any> = listOf(
+                generatedId,
+                fullTimestamp,
                 request.description,
                 uploadedImageUrl
             ) + request.dynamicFields.values
@@ -48,6 +53,14 @@ internal class GoogleSheetsTrackerStrategy(
                 .append(spreadsheetId, "$tabName!A1", body)
                 .setValueInputOption("USER_ENTERED")
                 .execute()
+
+            Bug(
+                id = generatedId,
+                description = request.description,
+                screenshotUri = uploadedImageUrl,
+                dynamicFields = request.dynamicFields,
+                createdAt = fullTimestamp
+            )
         }
     }
 

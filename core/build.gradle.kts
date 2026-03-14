@@ -32,6 +32,13 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "4.1.2"
+        }
+    }
+    ndkVersion = "29.0.14206865"
 
     buildTypes {
         release {
@@ -41,14 +48,10 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "IMGBB_BASE_URL", "\"https://api.imgbb.com/1/\"")
-            buildConfigField("String", "IMGBB_API_KEY", "\"c7af8dce9b3b0a074f04479580c89c2f\"")
-            buildConfigField("String", "SPREAD_SHEET_ID", "\"1NYmmRxmqRlP-sFXZ71t_jJlaH-bArnxmVWwTxMLIUsY\"")
         }
         debug {
             isMinifyEnabled = false
             buildConfigField("String", "IMGBB_BASE_URL", "\"https://api.imgbb.com/1/\"")
-            buildConfigField("String", "IMGBB_API_KEY", "\"c7af8dce9b3b0a074f04479580c89c2f\"")
-            buildConfigField("String", "SPREAD_SHEET_ID", "\"1NYmmRxmqRlP-sFXZ71t_jJlaH-bArnxmVWwTxMLIUsY\"")
         }
     }
     compileOptions {

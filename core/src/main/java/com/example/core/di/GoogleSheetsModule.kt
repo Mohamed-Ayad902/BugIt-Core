@@ -1,7 +1,7 @@
 package com.example.core.di
 
 import android.content.Context
-import com.example.core.R
+import com.example.core.utils.NativeKeys
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.sheets.v4.Sheets
@@ -13,6 +13,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.io.ByteArrayInputStream
 import javax.inject.Singleton
 
 @Module
@@ -25,10 +26,11 @@ internal object GoogleSheetsModule {
         val transport = GoogleNetHttpTransport.newTrustedTransport()
         val jsonFactory = GsonFactory.getDefaultInstance()
 
-        val credentials = context.resources.openRawResource(R.raw.google_credentials).use { inputStream ->
-            GoogleCredentials.fromStream(inputStream)
-                .createScoped(listOf(SheetsScopes.SPREADSHEETS))
-        }
+        val jsonString = NativeKeys.getGoogleCredentialsJson(context)
+        val inputStream = ByteArrayInputStream(jsonString.toByteArray(Charsets.UTF_8))
+
+        val credentials = GoogleCredentials.fromStream(inputStream)
+            .createScoped(listOf(SheetsScopes.SPREADSHEETS))
 
         return Sheets.Builder(transport, jsonFactory, HttpCredentialsAdapter(credentials))
             .setApplicationName("BugIt App")

@@ -1,15 +1,15 @@
 package com.example.core.di
 
 import android.content.Context
-import com.example.core.BuildConfig
 import com.example.core.feature.bug_reporting.data.repo.BugReportRepository
 import com.example.core.feature.bug_reporting.domain.repo.IBugReportRepository
 import com.example.core.strategies.image.IImageHostStrategy
-import com.example.core.strategies.issue_tracker.IIssueTrackerStrategy
-import com.example.core.strategies.issue_tracker.GoogleSheetsTrackerStrategy
 import com.example.core.strategies.image.ImgBBHostStrategy
+import com.example.core.strategies.issue_tracker.GoogleSheetsTrackerStrategy
+import com.example.core.strategies.issue_tracker.IIssueTrackerStrategy
 import com.example.core.utils.AndroidImageCompressor
 import com.example.core.utils.IImageCompressor
+import com.example.core.utils.NativeKeys
 import com.example.core_contracts.data_source.remote.INetworkProvider
 import com.google.api.services.sheets.v4.Sheets
 import dagger.Module
@@ -40,9 +40,10 @@ internal object RepositoryModule {
     @Provides
     @Singleton
     fun provideIssueTrackerStrategy(
-        sheetsService: Sheets
+        sheetsService: Sheets,
+        @ApplicationContext context: Context
     ): IIssueTrackerStrategy {
-        return GoogleSheetsTrackerStrategy(sheetsService, BuildConfig.SPREAD_SHEET_ID)
+        return GoogleSheetsTrackerStrategy(sheetsService, NativeKeys.getSpreadsheetId(context))
     }
 
     @Provides

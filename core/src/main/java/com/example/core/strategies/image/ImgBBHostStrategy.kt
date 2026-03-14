@@ -1,6 +1,5 @@
 package com.example.core.strategies.image
 
-import com.example.core.BuildConfig
 import com.example.core_contracts.data_source.remote.INetworkProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,7 +10,7 @@ internal class ImgBBHostStrategy(
     private val networkProvider: INetworkProvider
 ) : IImageHostStrategy {
 
-    override suspend fun uploadImage(imageBytes: ByteArray, expirationSeconds: Int): String {
+    override suspend fun uploadImage(imageBytes: ByteArray, expirationSeconds: Int?): String {
         val tempFile = withContext(Dispatchers.IO) {
             File.createTempFile("bug_screenshot_${UUID.randomUUID()}", ".png")
         }
@@ -23,7 +22,7 @@ internal class ImgBBHostStrategy(
             val response = networkProvider.postWithImagesFile<ImgBBDto, Any>(
                 responseWrappedModel = ImgBBDto::class.java,
                 pathUrl = "upload",
-                queryParams = hashMapOf("expiration" to expirationSeconds),
+                queryParams = expirationSeconds?.let { hashMapOf("expiration" to it) },
                 requestBody = null,
                 files = filesMap
             )
