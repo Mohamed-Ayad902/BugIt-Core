@@ -29,6 +29,14 @@ android {
     defaultConfig {
         minSdk = 24
 
+        // we tell the CMake compiler to treat all char types as unsigned
+        // across all architectures, so x86 behaves exactly like arm
+        externalNativeBuild {
+            cmake {
+                cppFlags += "-std=c++17"
+                cppFlags += "-funsigned-char"
+            }
+        }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
