@@ -16,13 +16,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-/**
- * Implementation of [IIssueTrackerStrategy] that logs bug reports into Google Sheets.
- * Each day's reports are stored in a separate tab named by the current date (dd-MM-yy).
- *
- * @property sheetsService The authorized Google Sheets API service instance.
- * @property spreadsheetId The unique identifier of the target spreadsheet.
- */
 internal class GoogleSheetsTrackerStrategy(
     private val sheetsService: Sheets,
     private val spreadsheetId: String
@@ -30,15 +23,18 @@ internal class GoogleSheetsTrackerStrategy(
 
     override val destination: ReportingDestination = ReportingDestination.GOOGLE_SHEETS
 
-    /**
-     * Appends a bug report as a new row in the spreadsheet.
-     * Maps [request] fields and the [uploadedImageUrl] into a flat row structure.
-     */
     override suspend fun saveIssue(request: BugReportRequest, uploadedImageUrl: String): Bug {
         return withContext(Dispatchers.IO) {
             val tabName = getCurrentDateTabName()
 
-            ensureTabExists(tabName)
+            val headerRow: List<Any> = listOf(
+                "Bug ID",
+                "Timestamp",
+                "Description",
+                "Screenshot URL"
+            ) + request.dynamicFields.keys
+
+            ensureTabExists(tabName, headerRow)
 
             val generatedId = UUID.randomUUID().toString()
             val fullTimestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
@@ -73,9 +69,10 @@ internal class GoogleSheetsTrackerStrategy(
     }
 
     /**
-     * Checks if a sheet with [tabName] exists; if not, creates it via a batch update.
+     * Checks if a sheet with [tabName] exists.
+     * If not, creates it and instantly appends the [headers] to Row 1.
      */
-    private fun ensureTabExists(tabName: String) {
+    private fun ensureTabExists(tabName: String, headers: List<Any>) {
         val spreadsheet = sheetsService.spreadsheets()[spreadsheetId].execute()
         val existingTabs = spreadsheet.sheets.map { it.properties.title }
 
@@ -90,6 +87,12 @@ internal class GoogleSheetsTrackerStrategy(
 
             sheetsService.spreadsheets()
                 .batchUpdate(spreadsheetId, batchUpdateRequest)
+                .execute()
+
+            val headerBody = ValueRange().setValues(listOf(headers))
+            sheetsService.spreadsheets().values()
+                .append(spreadsheetId, "$tabName!A1", headerBody)
+                .setValueInputOption("USER_ENTERED")
                 .execute()
         }
     }
