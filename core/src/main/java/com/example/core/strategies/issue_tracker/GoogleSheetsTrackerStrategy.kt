@@ -23,6 +23,9 @@ internal class GoogleSheetsTrackerStrategy(
 
     override val destination: ReportingDestination = ReportingDestination.GOOGLE_SHEETS
 
+    // stores the name of the tab we have already verified in this session
+    private var verifiedTabCache: String? = null
+
     override suspend fun saveIssue(request: BugReportRequest, uploadedImageUrl: String): Bug {
         return withContext(Dispatchers.IO) {
             val tabName = getCurrentDateTabName()
@@ -73,6 +76,8 @@ internal class GoogleSheetsTrackerStrategy(
      * If not, creates it and instantly appends the [headers] to Row 1.
      */
     private fun ensureTabExists(tabName: String, headers: List<Any>) {
+        if (verifiedTabCache == tabName) return
+
         val spreadsheet = sheetsService.spreadsheets()[spreadsheetId].execute()
         val existingTabs = spreadsheet.sheets.map { it.properties.title }
 
@@ -95,5 +100,7 @@ internal class GoogleSheetsTrackerStrategy(
                 .setValueInputOption("USER_ENTERED")
                 .execute()
         }
+
+        verifiedTabCache = tabName
     }
 }
