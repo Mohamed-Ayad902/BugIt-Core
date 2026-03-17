@@ -3,6 +3,7 @@ package com.example.core.di
 import android.content.Context
 import com.example.core.feature.bug_reporting.data.repo.BugReportRepository
 import com.example.core.feature.bug_reporting.domain.repo.IBugReportRepository
+import com.example.core.feature.bug_reporting.domain.repo.IBugReporterLocalDS
 import com.example.core.strategies.image.IImageHostStrategy
 import com.example.core.strategies.image.ImgBBHostStrategy
 import com.example.core.strategies.issue_tracker.GoogleSheetsTrackerStrategy
@@ -51,12 +52,14 @@ internal object RepositoryModule {
     fun provideBugReportRepository(
         imageCompressor: IImageCompressor,
         imageHostStrategy: IImageHostStrategy,
-        issueTrackerStrategy: IIssueTrackerStrategy
+        issueTrackerStrategy: IIssueTrackerStrategy,
+        localDS: IBugReporterLocalDS
     ): IBugReportRepository {
         return BugReportRepository(
             imageCompressor = imageCompressor,
             imageHostStrategy = imageHostStrategy,
-            issueTrackerStrategy = issueTrackerStrategy
+            issueTrackerStrategy = issueTrackerStrategy,
+            localDS = localDS,
         )
     }
 }

@@ -5,5 +5,11 @@ data class Bug(
     val description: String,
     val screenshotUri: String,
     val dynamicFields: Map<String, String>,
-    val createdAt: String
+    val createdAt: String,
+    val remoteImageUrl: String,
+    val status: SyncStatus
 )
+
+enum class SyncStatus {
+    PENDING, UPLOADING, COMPLETED, FAILED
+}

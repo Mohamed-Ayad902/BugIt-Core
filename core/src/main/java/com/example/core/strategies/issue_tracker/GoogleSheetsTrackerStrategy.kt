@@ -2,6 +2,7 @@ package com.example.core.strategies.issue_tracker
 
 import com.example.core.feature.bug_reporting.domain.model.Bug
 import com.example.core.feature.bug_reporting.domain.model.BugReportRequest
+import com.example.core.feature.bug_reporting.domain.model.SyncStatus
 import com.example.core.model.ReportingDestination
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.model.AddSheetRequest
@@ -61,7 +62,9 @@ internal class GoogleSheetsTrackerStrategy(
                 description = request.description,
                 screenshotUri = uploadedImageUrl,
                 dynamicFields = request.dynamicFields,
-                createdAt = fullTimestamp
+                createdAt = fullTimestamp,
+                status = SyncStatus.COMPLETED,
+                remoteImageUrl = uploadedImageUrl
             )
         }
     }

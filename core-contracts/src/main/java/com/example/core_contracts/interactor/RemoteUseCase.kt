@@ -1,12 +1,9 @@
 package com.example.core_contracts.interactor
 
-import com.example.core_contracts.exceptions.ExceptionCatcher
 import com.example.core_contracts.utils.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 /**
@@ -14,9 +11,12 @@ import kotlinx.coroutines.launch
  *
  * This class preserves the callback based invoke to return Resource of domain.
  */
-abstract class RemoteUseCase<Domain, in Body> {
+abstract class RemoteUseCase<Domain, in Body> : BaseUseCase<Domain>() {
 
-    protected abstract fun executeRemoteDS(body: Body? = null): Flow<Domain>
+    /**
+     * Executes the remote data source logic.
+     */
+    abstract fun executeRemoteDS(body: Body? = null): Flow<Domain>
 
     /**
      * Callback based entry point.
@@ -43,18 +43,4 @@ abstract class RemoteUseCase<Domain, in Body> {
             }
         }
     }
-
-    /**
-     * Central flow runner that maps exceptions thrown in the inner flow using ExceptionCatcher,
-     * then uses onResult to forward a Failure and a loading(false) signal.
-     */
-    protected open fun <M> runFlow(
-        requestExecution: Flow<M>,
-        onResult: suspend (Resource<Domain>) -> Unit = {}
-    ): Flow<M> = requestExecution
-        .catch { throwable ->
-            val mapped = ExceptionCatcher.map(throwable)
-            onResult.invoke(Resource.Failure(mapped))
-            onResult.invoke(Resource.loading(false))
-        }.flowOn(Dispatchers.IO)
 }

@@ -113,4 +113,16 @@ dependencies {
     // DI - Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // Room Database
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Hilt Extension for WorkManager
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 }

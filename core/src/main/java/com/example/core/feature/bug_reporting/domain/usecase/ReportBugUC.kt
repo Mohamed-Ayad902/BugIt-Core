@@ -15,7 +15,7 @@ class ReportBugUC @Inject constructor(
     override fun executeRemoteDS(body: BugReportRequest?): Flow<Bug> = flow {
         if (body == null || body.isInitialState()) throw ValidationException(BugReportRequest::class)
 
-        emit(repo.submitBugReport(body))
+//        emit(repo.submitBugReport(body))
     }
 
 }
